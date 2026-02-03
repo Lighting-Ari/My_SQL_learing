@@ -665,6 +665,16 @@ WHERE last_name BETWEEN 'A' AND 'M';
 SELECT * FROM orders
 WHERE customer_id BETWEEN 1 AND 3;
 
+Select * from orders
+WHERE order_time BETWEEN '2023-01-01' AND '2023-01-31 23:59:59';
+
+SELECT * FROM orders 
+WHERE customer_id BETWEEN 5 AND  7;
+
+
+SELECT * FROM customers
+WHERE last_name BETWEEN 'A' AND 'L';
+
 -- How Pattern Matching with LIKE in SQL. Wildcard for flexible Data filtering.
 
 /*
@@ -687,6 +697,8 @@ WHERE last_name LIKE '%a%';
 -- We can use this for number.
 SELECT * FROM products
 WHERE price LIKE '3%';
+	-- we have to use single qute for number as well. bcz mysql will convert the column to string before sesarching.
+
 
 -- Here using _ and charecter we can define the total position of the string and match pattern to specific position of the string.
 SELECT * FROM customers
@@ -697,6 +709,181 @@ WHERE first_name LIKE '_o_';
 
 
 -- How to Sorting data lowest to highest and highest to lowest using ORDER BY in SQL.
+SHOW DATABASES;
+USE coffee_store;
+SHOW TABLES;
+
+SELECT * FROM customers;
+
+SELECT * FROM customers
+ORDER BY first_name ASC; -- acesding order.
+
+SELECT * FROM customers
+ORDER BY first_name DESC; -- decending order.
+
+SELECT * FROM products
+ORDER BY price ASC;
+
+SELECT * FROM customers
+ORDER BY first_name;
+
+SELECT * FROM customers
+ORDER BY first_name DESC;
+
+SELECT * FROM customers
+ORDER BY last_name, first_name; -- if we don't specify then it mean ascending order
+
+SELECT * FROM customers
+WHERE last_name = 'Bluth'
+ORDER BY first_name desc;
+
+/*
+1. From the products table, select the name and price of all products with a coffee origin equal to "Colombia" or "Indonesia". 
+Sort the results by name , from A-Z.
+
+2. From the orders table, select all the orders from "February 2023", for customers with IDs of "19, 20, 21 or 24".
+
+3. From the customers table, select the first name and phone number of all customers whose last name contains the patters 'ar'.
+*/
+
+-- 1.
+
+SELECT * FROM products;
+
+SELECT name, price from products 
+WHERE coffee_origin IN ('Colombia', 'Indonesia')
+ORDER BY name;
+
+SELECT name, price from products 
+WHERE coffee_origin = 'Colombia' OR coffee_origin = 'Indonesia'
+ORDER BY name;
+
+-- 2. From the orders table, select all the orders from "February 2023", for customers with IDs of "19, 20, 21 or 24".
+	SELECT * FROM orders;
+SELECT * FROM orders
+WHERE order_time BETWEEN '2023-02-01'  AND '2023-02-28 23:59:59.99999' 
+AND customer_id IN ('19', '20', '21', '24');
+
+
+SELECT * FROM orders
+WHERE year(order_time) = 2023 AND month(order_time) = 2
+AND customer_id IN (19, 20, 21, 24);
+
+    
+-- 3. From the customers table, select the first name and phone number of all customers whose last name contains the patters 'ar'.
+SELECT * FROM customers;
+
+SELECT first_name, phone_number FROM customers
+WHERE last_name LIKE '%ar%';
+
+
+
+-- SELECTING DISTINCT VALUES IN SQL (REMOVING DUPLICATE VALUES) 
+SELECT coffee_origin FROM products;
+
+SELECT DISTINCT coffee_origin FROM products;
+	-- The DISTINCT keyword help us to ditinct the values or return the value after removing duplicate.
+    
+SELECT DISTINCT coffee_origin , id FROM products;
+	-- Each coffee_origin now apper with there id and each row have there uniqe id and coffee_origin. Here the coffee_origin is not showing duplicate instead it's become uniqe by combining both.
+
+SELECT DISTINCT coffee_origin , id FROM products;
+	-- Here we will get 6 result instead of 7 bcz the the indonesia coffee have same price for 2 row.
+
+SELECT DISTINCT customer_id, product_id FROM orders
+WHERE order_time BETWEEN '2023-02-01' AND '2023-02-28 23:59:59.999999'
+ORDER BY customer_id ASC;
+	-- Here requesting for return the value customer_id for feb 2023 in ASC order.alter
+    
+
+-- Controling return result set size wit LIMIT and OFFSET in SQL Queries.
+SELECT * FROM customers
+LIMIT 5; -- We did not specify any order so it is returing primary key as default. Using this we can limit the result to specific.
+
+SELECT * FROM customers 
+LIMIT 5 OFFSET 5; -- if we need the result which have data after the 5 row. There we use offset. It will give us the result next 5 row.
+
+-- the offset tell mysql to which row to start and the limit tell where to stop.
+-- Also keep in mind the actual row position start with 0-9 and id is start with 1-10
+
+SELECT * FROM customers
+LIMIT 7, 3; -- we can use offset like this also. this also we can use for limit and offset.
+
+SELECT * FROM customers
+LIMIT 3 OFFSET 7; -- This is the same as above.
+
+-- 3 Difrent way to use LIMTI AND OFFSET
+
+-- 1. only return row-count rows
+	SELECT * FROM customers
+	LIMIT `rowcount`;
+    
+-- 2. return row_count rows, starting from after the offset values
+	SELECT * FROM customers
+    LIMIT `offset`, `row_count`;
+
+-- 3. same before 
+	SELECT * FROM customers
+    LIMIT `row_count` OFFSET `offset`;
+
+
+SELECT * FROM customers
+ORDER BY last_name 
+LIMIT 10; -- return the data from row id 10 to next 10 row last_name
+
+-- ** also MySql set limit to return value we can check or change this from tool bar. It dose for performance reason.
+
+
+-- Improving Readability with column name Aliases in SQL Queries 
+SELECT * FROM products; 
+
+SELECT id, name AS coffee, price, coffee_origin AS country FROM products;
+-- Using the AS keyword after the column name we give aliases to columnf
+
+SELECT id, name cofee, price, coffee_origin county FROM products;
+-- Without using AS keyword we will get same result but this is not recommened as this not good for readebality for developer. 
+
+
+-- 6.3 Challenge
+/*
+1. From the customers table, select all the distinct 'last names', 
+and order them alphabetically (from A to Z).
+
+2. Select the first 4 orders place for the product with ID 3, in feb 2023.
+
+3. Select the name, price and coffee origin from the product table, 
+but rename the price column to retail price in the result set.
+*/
+
+SELECT * FROM customers;
+
+-- 1.
+SELECT DISTINCT last_name FROM customers
+ORDER BY last_name;
+
+-- 2. Select the first 4 orders place for the product with ID 3, in feb 2023.
+
+SHOW TABLES;
+
+SELECT * FROM orders
+WHERE order_time BETWEEN '2023-02-01' AND '2023-02-28 23:59:59.999999'
+AND product_id = '3' 
+ORDER BY order_time
+LIMIT 4;
+
+-- 3. Select the name, price and coffee origin from the product table, 
+-- but rename the price column to retail price in the result set.
+
+SELECT name, price AS 'Retail Price', coffee_origin FROM products;
+
+
+
+
+
+
+
+
+
 
 
 
