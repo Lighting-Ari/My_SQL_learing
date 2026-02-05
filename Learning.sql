@@ -877,6 +877,103 @@ LIMIT 4;
 SELECT name, price AS 'Retail Price', coffee_origin FROM products;
 
 
+-- Mastering Multi-Table Queries with MySQL : Comprehensive guide to ALL JOIN type
+
+-- INNER JOIN
+SHOW DATABASES;
+
+USE coffee_store;
+
+SHOW TABLES;
+
+SELECT * FROM orders;
+SELECT * FROM products;
+
+	-- Here we are retrieving data from the both table. After from we mention table1 and use KEYWORD INNER JOIN table2.
+    -- then using ON keyword to table1 forgin key = table2 primary key to specify the relatedtables column.
+    -- we can also use the abbribiation/ Aliases of the table or column name. 
+SELECT products.name, orders.order_time FROM orders INNER JOIN products ON orders.product_id = products.id;
+
+SELECT p.name, o.order_time FROM orders AS o JOIN products p ON o.product_id = p.id;
+
+	-- We can use WHERE keyword and ORDER BY keyword.
+SELECT p.name, o.order_time 
+FROM orders AS o
+JOIN products AS p ON o.product_id = p.id 
+WHERE o.product_id = 5
+ORDER BY o.order_time;
+
+-- Inner JOIN syntax
+/*
+SELECT <table name>.<column name>, ... FROM <table 1>
+JOIN <table 2 > ON <table 1>.<column name> = <table 2>.<column name>
+WHERE BY clause,  <if needed>
+ORDER BY clause ;  <if needed>
+*/
+
+
+-- Write a query which joins the orders table and the customers table.
+
+SELECT * FROM orders;
+SELECT * FROM customers;
+SELECT c.first_name, o.order_time FROM orders AS o INNER JOIN customers AS c ON o.customer_id = c.id
+WHERE c.last_name = 'Martin'
+ORDER BY first_name;
+
+
+-- LEFT JOIN 
+
+UPDATE orders
+SET customer_id = null
+WHERE id IN (1,3,5);
+
+SELECT * FROM customers;
+SELECT * FROM orders;
+
+/*
+We can use table_name.* to retrieve all columns from a specific table.
+In this query, orders is the left table and customers is the right table.
+Since we are using a LEFT JOIN, all rows from the orders table are returned, along with matching rows from the customers table.
+If no matching customer exists for an order, the customer-related columns will contain NULL values.
+*/
+
+
+SELECT o.*, c.* FROM orders o LEFT JOIN customers c ON o.customer_id = c.id
+ORDER BY o.order_time;
+/*
+This means:
+
+All rows from the LEFT table (orders) are returned
+Matching rows from the RIGHT table (customers) are returned
+If an order has no matching customer, customer columns (c.*) will be NULL
+
+*Orders without customers → still included
+*Customers without orders → NOT included
+*/
+
+
+-- if the order is incorrect for the table.
+/*
+Here, we use a LEFT JOIN with customers as the left table.
+This ensures that all customers are included in the result set, even if they have not placed any orders.
+When no matching row exists in the orders table, the order-related columns (o.*) return NULL.
+The join condition o.customer_id = c.id remains intact and is used to find matching records.
+*/
+SELECT o.*, c.* FROM customers c LEFT JOIN orders o ON o.customer_id = c.id
+ORDER BY o.order_time;
+
+/*
+This means:
+All rows from customers are returned
+Matching rows from orders are returned where the condition matches
+If a customer has no matching order, MySQL returns:
+	NULL values for orders columns
+*That’s expected behavior, not a broken link.
+*/
+
+SELECT o.*, c.* FROM customers c LEFT JOIN orders o ON o.customer_id = c.id
+WHERE o.customer_id = '17'
+ORDER BY o.product_id;
 
 
 
@@ -886,5 +983,3 @@ SELECT name, price AS 'Retail Price', coffee_origin FROM products;
 
 
 
-
-    
